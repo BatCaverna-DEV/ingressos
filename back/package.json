@@ -1,0 +1,25 @@
+{
+  "name": "ingressos-back",
+  "version": "1.0.0",
+  "description": "Back-end do sistema de controle de ingressos - IFMA Campus Coelho Neto",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "nodemon index.js",
+    "db:criar": "node config/criarBanco.js"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.14.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mariadb": "^3.3.1",
+    "sequelize": "^6.37.3",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
