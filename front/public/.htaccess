@@ -1,0 +1,10 @@
+Options -MultiViews
+RewriteEngine On
+RewriteBase /ingressos/
+
+# Serve arquivos e diretórios existentes diretamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redireciona todo o resto para index.html (SPA)
+RewriteRule ^ index.html [L]
