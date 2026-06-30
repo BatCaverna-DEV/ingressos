@@ -1,3 +1,4 @@
+import QRCode from 'qrcode';
 import { Ingresso, Evento, Categoria } from '../model/index.js';
 import { sucesso, erro } from '../helpers/resposta.js';
 
@@ -45,9 +46,18 @@ export const buscarPorCodigo = async (req, res) => {
 
 export const criar = async (req, res) => {
   try {
-    const { descricao, categorias_id, eventos_id } = req.body;
-    const ingresso = await Ingresso.create({ codigo: gerarCodigo(), descricao, status: 1, categorias_id, eventos_id });
-    return sucesso(res, ingresso, 'Ingresso criado', 201);
+    const { descricao, categorias_id, eventos_id, quantidade = 1 } = req.body;
+    const qty = Math.min(Math.max(parseInt(quantidade) || 1, 1), 100);
+
+    const ingressos = await Promise.all(
+      Array.from({ length: qty }, async () => {
+        const codigo = gerarCodigo();
+        const qrcode = await QRCode.toDataURL(codigo);
+        return Ingresso.create({ codigo, descricao, status: 1, qrcode, categorias_id, eventos_id });
+      })
+    );
+
+    return sucesso(res, ingressos, `${qty} ingresso(s) criado(s)`, 201);
   } catch (e) {
     return erro(res, 'Erro ao criar ingresso', 500, e.message);
   }

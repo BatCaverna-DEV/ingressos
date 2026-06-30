@@ -28,7 +28,7 @@ const sincronizarTabelas = async () => {
 };
 
 const inserirDadosIniciais = async () => {
-  const categorias = ['Estudante', 'Professor', 'Servidor', 'Visitante', 'Palestrante'];
+  const categorias = ['Estudante', 'Professor', 'Servidor', 'Visitante', 'Palestrante', 'Externo'];
   for (const descricao of categorias) {
     await Categoria.create({ descricao, status: 1 });
   }

@@ -24,11 +24,11 @@ export const loginGoogle = async (req, res) => {
         nome: name,
         email,
         categoria: 3,
-        status: 'ativo',
+        status: 1,
       });
     }
 
-    if (usuario.status !== 'ativo') return erro(res, 'Usuário inativo', 403);
+    if (usuario.status !== 1) return erro(res, 'Usuário inativo', 403);
 
     const token = gerarToken({ id: usuario.id, email: usuario.email, categoria: usuario.categoria });
     return sucesso(res, {
@@ -59,10 +59,24 @@ export const buscar = async (req, res) => {
   }
 };
 
+export const registrar = async (req, res) => {
+  try {
+    const { nome, email, matricula } = req.body;
+    if (!nome || !email) return erro(res, 'Nome e e-mail são obrigatórios', 400);
+    if (!email.toLowerCase().endsWith('@gmail.com')) return erro(res, 'Utilize um e-mail do Google (@gmail.com)', 400);
+    const existente = await Usuario.findOne({ where: { email } });
+    if (existente) return erro(res, 'E-mail já cadastrado', 409);
+    const usuario = await Usuario.create({ nome, email, matricula: matricula || null, categoria: 3, status: 1 });
+    return sucesso(res, { id: usuario.id, nome: usuario.nome, email: usuario.email }, 'Cadastro realizado com sucesso!', 201);
+  } catch (e) {
+    return erro(res, 'Erro ao realizar cadastro', 500, e.message);
+  }
+};
+
 export const criar = async (req, res) => {
   try {
-    const { nome, email, categoria, status } = req.body;
-    const usuario = await Usuario.create({ nome, email, categoria, status: status || 'ativo' });
+    const { nome, email, matricula, categoria, status } = req.body;
+    const usuario = await Usuario.create({ nome, email, matricula: matricula || null, categoria, status: status ?? 1 });
     return sucesso(res, usuario, 'Usuário criado', 201);
   } catch (e) {
     return erro(res, 'Erro ao criar usuário', 500, e.message);
@@ -73,8 +87,8 @@ export const atualizar = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
     if (!usuario) return erro(res, 'Usuário não encontrado', 404);
-    const { nome, email, categoria, status } = req.body;
-    await usuario.update({ nome, email, categoria, status });
+    const { nome, email, matricula, categoria, status } = req.body;
+    await usuario.update({ nome, email, matricula: matricula || null, categoria, status });
     return sucesso(res, usuario, 'Usuário atualizado');
   } catch (e) {
     return erro(res, 'Erro ao atualizar usuário', 500, e.message);
@@ -85,7 +99,7 @@ export const remover = async (req, res) => {
   try {
     const usuario = await Usuario.findByPk(req.params.id);
     if (!usuario) return erro(res, 'Usuário não encontrado', 404);
-    await usuario.update({ status: 'inativo' });
+    await usuario.update({ status: 0 });
     return sucesso(res, null, 'Usuário desativado');
   } catch (e) {
     return erro(res, 'Erro ao remover usuário', 500, e.message);

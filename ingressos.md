@@ -36,18 +36,21 @@ ingressos/
 │   │   ├── Evento.js
 │   │   ├── Categoria.js
 │   │   ├── Ingresso.js
+│   │   ├── Inscricao.js
 │   │   └── Comissao.js
 │   ├── controller/
 │   │   ├── UsuarioController.js
 │   │   ├── EventoController.js
 │   │   ├── CategoriaController.js
 │   │   ├── IngressoController.js
+│   │   ├── InscricaoController.js
 │   │   └── ComissaoController.js
 │   ├── routes/
 │   │   ├── usuario.routes.js
 │   │   ├── evento.routes.js
 │   │   ├── categoria.routes.js
 │   │   ├── ingresso.routes.js
+│   │   ├── inscricao.routes.js
 │   │   └── comissao.routes.js
 │   ├── helpers/
 │   │   ├── auth.js              # Gerar/verificar JWT
@@ -82,7 +85,8 @@ ingressos/
             ├── auth.service.js
             ├── eventos.service.js
             ├── categorias.service.js
-            └── ingressos.service.js
+            ├── ingressos.service.js
+            └── inscricoes.service.js
 ```
 
 ---
@@ -92,43 +96,55 @@ ingressos/
 ### Diagrama de Tabelas
 
 ```
-usuarios ──────────────────┐
-  id UUID PK               │
-  nome VARCHAR(45)         │
-  email VARCHAR(100)       │
-  senha VARCHAR(255)       ├──< comissoes
-  categoria INT            │     id UUID PK
-  status VARCHAR(45)       │     categoria INT
-                           │     usuarios_id UUID (FK)
-                           │     eventos_id UUID (FK)
-eventos ───────────────────┤
-  id UUID PK               │
-  descricao VARCHAR(100)   │
-  inicio DATETIME          │
-  fim DATETIME             ├──< ingressos
-  status INT               │     id UUID PK
-                           │     codigo VARCHAR(100)
-                           │     descricao VARCHAR(100)
-categorias ────────────────┘     status INT
-  id UUID PK                     qrcode TEXT
-  descricao VARCHAR(45)          categorias_id UUID (FK)
-  status INT                     eventos_id UUID (FK)
+usuarios ──────────────────────────────────────┐
+  id UUID PK                                   │
+  nome VARCHAR(45)                             │
+  email VARCHAR(100)                           ├──< comissoes
+  senha VARCHAR(255)                           │     id UUID PK
+  categoria INT                                │     categoria INT
+  status INT                                   │     usuarios_id UUID (FK)
+                                               │     eventos_id UUID (FK)
+eventos ────────────────────────────────────── ┤
+  id UUID PK                                   │
+  descricao VARCHAR(100)                       │
+  inicio DATETIME                              ├──< inscricoes
+  fim DATETIME                                 │     id UUID PK
+  status INT                                   │     usuarios_id UUID (FK)
+  quantidade INT                               │     eventos_id UUID (FK)
+                                               │     categorias_id UUID (FK)
+categorias ────────────────────────────────────┘           │
+  id UUID PK                                               │
+  descricao VARCHAR(45)                                    ▼
+  status INT                                        ingressos
+                                                      id UUID PK
+                                                      codigo VARCHAR(100)
+                                                      descricao VARCHAR(100)
+                                                      status INT
+                                                      qrcode TEXT
+                                                      categorias_id UUID (FK)
+                                                      eventos_id UUID (FK)
+                                                      usuarios_id UUID (FK)
+                                                      inscricoes_id UUID (FK)
 ```
 
 ### Descrição das tabelas
 
-| Tabela      | Finalidade |
-|-------------|------------|
-| `usuarios`  | Usuários do sistema (admins, operadores) |
-| `eventos`   | Eventos cadastrados no campus |
-| `categorias`| Tipos de ingresso (Ex: Estudante, Professor, Visitante) |
-| `ingressos` | Ingressos emitidos, ligados a um evento e categoria |
-| `comissoes` | Membros que organizam ou trabalham em cada evento |
+| Tabela        | Finalidade |
+|---------------|------------|
+| `usuarios`    | Usuários do sistema (admins, operadores, visitantes) |
+| `eventos`     | Eventos cadastrados no campus |
+| `categorias`  | Tipos de ingresso (Ex: Estudante, Professor, Visitante) |
+| `inscricoes`  | Vínculo entre usuário, evento e categoria; gerada ao inscrever |
+| `ingressos`   | Ingressos emitidos automaticamente a partir de uma inscrição |
+| `comissoes`   | Membros que organizam ou trabalham em cada evento |
 
 ### Campos de status
 
-- **usuarios.categoria**: `1`=Admin, `2`=Operador, `3`=Visitante
+- **usuarios.categoria**: `1`=Administrador, `2`=Estudante, `3`=Externo
+- **usuarios.status**: `0`=Pendente (aguardando aprovação), `1`=Ativo, `2`=Indeferido
+- **usuarios.status**: `0`=Pendente, `1`=Ativo, `2`=Indeferido
 - **eventos.status / categorias.status**: `1`=Ativo, `0`=Inativo
+- **eventos.quantidade**: número de ingressos gerados por inscrição
 - **ingressos.status**: `1`=Disponível, `2`=Usado, `0`=Cancelado
 - **comissoes.categoria**: `1`=Organizador, `2`=Voluntário, `3`=Palestrante
 
@@ -182,9 +198,20 @@ Base URL: `http://localhost:3000/api`
 |--------|-------------------------------|------------------------------|
 | GET    | `/ingressos?eventos_id=X`     | Lista (filtra por evento)    |
 | GET    | `/ingressos/codigo/:codigo`   | Busca por código             |
-| POST   | `/ingressos`                  | Emite ingresso               |
+| POST   | `/ingressos`                  | Emite ingresso avulso        |
 | PATCH  | `/ingressos/validar/:codigo`  | Valida ingresso na entrada   |
 | DELETE | `/ingressos/:id`              | Cancela ingresso             |
+
+### Inscrições 🔒
+
+| Método | Rota                              | Descrição                                          |
+|--------|-----------------------------------|----------------------------------------------------|
+| GET    | `/inscricoes?eventos_id=X`        | Lista inscrições (filtra por evento ou usuário)    |
+| GET    | `/inscricoes/:id`                 | Busca inscrição por ID (inclui ingressos)          |
+| POST   | `/inscricoes`                     | Inscreve usuário e emite ingressos automaticamente |
+| DELETE | `/inscricoes/:id`                 | Cancela inscrição e invalida os ingressos          |
+
+> O `usuarios_id` do POST `/inscricoes` é extraído do token JWT — não é enviado no corpo.
 
 ### Comissões 🔒
 
@@ -286,7 +313,7 @@ id: {
 const evento = await Evento.create({ descricao, inicio, fim, status });
 ```
 
-O arquivo `helpers/uuid.js` permanece disponível para gerar UUIDs em contextos pontuais fora do Sequelize (ex: o código único do ingresso).
+O arquivo `helpers/uuid.js` permanece disponível para gerar UUIDs em contextos pontuais fora do Sequelize. O código único do ingresso (`ING-XXXXXXXXX`) é gerado via `Date.now()` + string aleatória, tanto no `IngressoController` quanto no `InscricaoController`.
 
 ---
 
@@ -373,12 +400,17 @@ O token é salvo em `localStorage` com a chave `token`. O interceptor do Axios (
 ```
 1. Administrador faz login
 2. Cria categorias (Ex: "Estudante", "Professor")
-3. Cria um evento com data de início e fim
-4. Emite ingressos para o evento, associando uma categoria
-5. Sistema gera um código único (ING-XXXXXXXXX)
-6. Na portaria, operador acessa /validar e digita o código
-7. Sistema marca o ingresso como "Usado" (status 2)
+3. Cria um evento com data de início, fim e quantidade de ingressos por inscrição
+4. Na tela de detalhe do evento, inscreve um usuário escolhendo categoria
+5. O sistema cria a inscrição e emite automaticamente N ingressos com QR code
+   (N = evento.quantidade)
+6. Na portaria, operador acessa /validar e digita o código ou lê o QR
+7. Sistema verifica o status e marca o ingresso como "Usado" (status 2)
 ```
+
+### Cancelamento de inscrição
+
+Ao deletar uma inscrição (`DELETE /inscricoes/:id`), todos os ingressos vinculados a ela são marcados como "Cancelado" (status 0) antes de a inscrição ser removida do banco.
 
 ---
 

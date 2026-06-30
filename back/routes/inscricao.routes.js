@@ -1,15 +1,14 @@
 import { Router } from 'express';
-import { loginGoogle, registrar, listar, buscar, criar, atualizar, remover } from '../controller/UsuarioController.js';
+import { listar, buscar, criar, deferir, indeferir, remover } from '../controller/InscricaoController.js';
 import { verificarToken } from '../helpers/auth.js';
 
 const router = Router();
 
-router.post('/login/google', loginGoogle);
-router.post('/registrar', registrar);
 router.get('/', verificarToken, listar);
 router.get('/:id', verificarToken, buscar);
 router.post('/', verificarToken, criar);
-router.put('/:id', verificarToken, atualizar);
+router.patch('/:id/deferir', verificarToken, deferir);
+router.patch('/:id/indeferir', verificarToken, indeferir);
 router.delete('/:id', verificarToken, remover);
 
 export default router;

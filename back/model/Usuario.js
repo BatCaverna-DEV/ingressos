@@ -16,15 +16,20 @@ const Usuario = sequelize.define('usuarios', {
     allowNull: false,
     unique: true,
   },
+  matricula: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
+  },
   categoria: {
     type: DataTypes.INTEGER,
     allowNull: false,
     comment: '1=admin, 2=operador, 3=visitante',
   },
   status: {
-    type: DataTypes.STRING(45),
+    type: DataTypes.INTEGER,
     allowNull: false,
-    defaultValue: 'ativo',
+    defaultValue: 1,
+    comment: '1=ativo, 0=inativo',
   },
 });
 

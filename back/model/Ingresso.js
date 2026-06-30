@@ -34,6 +34,14 @@ const Ingresso = sequelize.define('ingressos', {
     type: DataTypes.UUID,
     allowNull: false,
   },
+  usuarios_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+  inscricoes_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
 });
 
 export default Ingresso;

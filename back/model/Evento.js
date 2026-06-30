@@ -25,6 +25,12 @@ const Evento = sequelize.define('eventos', {
     defaultValue: 1,
     comment: '1=ativo, 0=inativo',
   },
+  quantidade: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+    comment: 'quantidade de ingressos emitidos por inscrição',
+  },
 });
 
 export default Evento;
