@@ -20,10 +20,11 @@ export const loginGoogle = async (req, res) => {
     let usuario = await Usuario.findOne({ where: { email } });
 
     if (!usuario) {
+      const categoria = email.toLowerCase().endsWith('@acad.ifma.edu.br') ? 2 : 3;
       usuario = await Usuario.create({
         nome: name,
         email,
-        categoria: 3,
+        categoria,
         status: 1,
       });
     }
