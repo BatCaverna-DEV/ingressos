@@ -8,13 +8,40 @@
     </div>
 
     <div class="validator-wrapper">
-      <!-- Card principal -->
+      <!-- Card da câmera -->
       <div class="validator-card">
         <div class="validator-icon">
           <i class="fas fa-qrcode"></i>
         </div>
-        <h5 class="validator-label">Código do Ingresso</h5>
+        <h5 class="validator-label">Escanear QR Code</h5>
 
+        <!-- Leitor de câmera -->
+        <div v-show="scanAtivo" class="camera-card">
+          <div class="camera-header">
+            <i class="fas fa-camera me-2"></i> Aponte a câmera para o QR Code
+          </div>
+          <div class="camera-viewport">
+            <div id="qr-reader"></div>
+            <div class="scan-overlay">
+              <div class="scan-frame">
+                <span class="corner tl"></span>
+                <span class="corner tr"></span>
+                <span class="corner bl"></span>
+                <span class="corner br"></span>
+              </div>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="camera-btn" @click="alternarCamera" :class="{ 'camera-btn-active': scanAtivo }">
+          <i :class="`fas fa-${scanAtivo ? 'stop-circle' : 'camera'} me-2`"></i>
+          {{ scanAtivo ? 'Parar câmera' : 'Escanear com câmera' }}
+        </button>
+
+        <div class="divider"><span>ou</span></div>
+
+        <h5 class="validator-label">Código do Ingresso</h5>
         <div class="input-group-custom">
           <input
             v-model="codigo"
@@ -28,32 +55,6 @@
             <span v-if="carregando" class="spinner-border spinner-border-sm"></span>
             <span v-else><i class="fas fa-check"></i> Validar</span>
           </button>
-        </div>
-
-        <div class="divider"><span>ou</span></div>
-
-        <button class="camera-btn" @click="alternarCamera" :class="{ 'camera-btn-active': scanAtivo }">
-          <i :class="`fas fa-${scanAtivo ? 'stop-circle' : 'camera'} me-2`"></i>
-          {{ scanAtivo ? 'Parar câmera' : 'Escanear com câmera' }}
-        </button>
-      </div>
-
-      <!-- Leitor de câmera -->
-      <div v-show="scanAtivo" class="camera-card">
-        <div class="camera-header">
-          <i class="fas fa-camera me-2"></i> Aponte a câmera para o QR Code
-        </div>
-        <div class="camera-viewport">
-          <div id="qr-reader"></div>
-          <div class="scan-overlay">
-            <div class="scan-frame">
-              <span class="corner tl"></span>
-              <span class="corner tr"></span>
-              <span class="corner bl"></span>
-              <span class="corner br"></span>
-            </div>
-            <div class="scan-line"></div>
-          </div>
         </div>
       </div>
 
@@ -310,10 +311,12 @@ onUnmounted(() => pararCamera());
 
 /* Câmera */
 .camera-card {
-  background: white;
-  border-radius: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
 .camera-header {
