@@ -70,7 +70,7 @@ export const criar = async (req, res) => {
     const inscricao = await Inscricao.create({ usuarios_id, eventos_id, categorias_id: categoria.id, status: precisaValidacao ? 0 : 1 });
 
     if (!precisaValidacao) {
-      const quantidade = usuario.categoria === 2 ? 2 : (evento.quantidade || 1);
+      const quantidade = usuario.categoria === 2 ? 3 : (evento.quantidade || 1);
       const ingressos = await Promise.all(
         Array.from({ length: quantidade }, async () => {
           const codigo = `ING-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
