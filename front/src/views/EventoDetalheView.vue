@@ -55,7 +55,16 @@
         </button>
 
         <RouterLink v-if="isAdmin" to="/validar" class="btn-validar w-100 mt-2">
-          <i class="fas fa-qrcode"></i> Validar Ingressos
+          <div class="btn-validar-inner">
+            <div class="btn-validar-icon">
+              <i class="fas fa-qrcode"></i>
+            </div>
+            <div class="btn-validar-text">
+              <span class="btn-validar-label">Validar Ingressos</span>
+              <span class="btn-validar-sub">Escanear QR Code</span>
+            </div>
+            <i class="fas fa-chevron-right btn-validar-arrow"></i>
+          </div>
         </RouterLink>
 
         <!-- Auto-inscrição para usuário Padrão -->
@@ -640,25 +649,64 @@ const cancelarMinhaInscricao = async () => {
 .btn-primary-action:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-validar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1.25rem;
-  border-radius: 0.5rem;
-  border: 2px solid #4f46e5;
-  background: white;
-  color: #4f46e5;
-  font-size: 0.875rem;
-  font-weight: 600;
+  display: block;
   text-decoration: none;
-  transition: all 0.15s;
-  cursor: pointer;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  padding: 1px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
 }
 
 .btn-validar:hover {
-  background: #f5f3ff;
-  color: #4f46e5;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-validar-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 0.7rem;
+  color: white;
+}
+
+.btn-validar-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.btn-validar-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.btn-validar-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.btn-validar-sub {
+  font-size: 0.72rem;
+  opacity: 0.8;
+  line-height: 1;
+}
+
+.btn-validar-arrow {
+  font-size: 0.75rem;
+  opacity: 0.7;
 }
 .w-100 { width: 100%; }
 
