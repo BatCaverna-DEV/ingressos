@@ -1,5 +1,5 @@
 import { OAuth2Client } from 'google-auth-library';
-import { Usuario } from '../model/index.js';
+import { Usuario, Ingresso, Inscricao } from '../model/index.js';
 import { gerarToken } from '../helpers/auth.js';
 import { sucesso, erro } from '../helpers/resposta.js';
 
@@ -104,5 +104,23 @@ export const remover = async (req, res) => {
     return sucesso(res, null, 'Usuário desativado');
   } catch (e) {
     return erro(res, 'Erro ao remover usuário', 500, e.message);
+  }
+};
+
+export const excluir = async (req, res) => {
+  try {
+    if (req.usuario?.categoria !== 1) return erro(res, 'Apenas administradores podem excluir usuários', 403);
+
+    const usuario = await Usuario.findByPk(req.params.id);
+    if (!usuario) return erro(res, 'Usuário não encontrado', 404);
+    if (usuario.categoria < 2) return erro(res, 'Não é possível excluir um administrador', 400);
+
+    await Ingresso.destroy({ where: { usuarios_id: usuario.id } });
+    await Inscricao.destroy({ where: { usuarios_id: usuario.id } });
+    await usuario.destroy();
+
+    return sucesso(res, null, 'Usuário excluído com sucesso');
+  } catch (e) {
+    return erro(res, 'Erro ao excluir usuário', 500, e.message);
   }
 };

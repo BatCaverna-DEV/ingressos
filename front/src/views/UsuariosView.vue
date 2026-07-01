@@ -48,6 +48,15 @@
               <button class="action-btn" @click="abrirModal(u)">
                 <i class="fas fa-pen"></i>
               </button>
+              <button
+                v-if="u.categoria >= 2"
+                class="action-btn action-btn-danger"
+                @click="excluirUsuario(u)"
+                :disabled="excluindo === u.id"
+              >
+                <span v-if="excluindo === u.id" class="spinner-border spinner-border-sm"></span>
+                <i v-else class="fas fa-trash"></i>
+              </button>
             </td>
           </tr>
           <tr v-if="usuarios.length === 0">
@@ -126,6 +135,7 @@ import api from '../services/api.js';
 const usuarios = ref([]);
 const carregando = ref(false);
 const salvando = ref(false);
+const excluindo = ref(null);
 const alerta = ref({ msg: null, tipo: 'success' });
 const form = ref({ id: null, nome: '', email: '', matricula: '', categoria: 2, status: 1 });
 let modal = null;
@@ -177,6 +187,19 @@ const salvar = async () => {
   }
 };
 
+const excluirUsuario = async (u) => {
+  if (!confirm(`Tem certeza que deseja excluir "${u.nome}"? Esta ação não pode ser desfeita.`)) return;
+  excluindo.value = u.id;
+  try {
+    await api.delete(`/usuarios/${u.id}/excluir`);
+    alerta.value = { msg: 'Usuário excluído com sucesso!', tipo: 'success' };
+    await carregar();
+  } catch (e) {
+    alerta.value = { msg: e.response?.data?.mensagem || 'Erro ao excluir usuário', tipo: 'danger' };
+  } finally {
+    excluindo.value = null;
+  }
+};
 </script>
 
 <style scoped>
@@ -315,6 +338,14 @@ const salvar = async () => {
 }
 
 .action-btn:hover { background: #e2e8f0; color: #1e293b; }
+.action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.action-btn-danger {
+  margin-left: 0.4rem;
+  color: #dc2626;
+}
+
+.action-btn-danger:hover { background: #fee2e2; color: #b91c1c; }
 
 .empty-row {
   text-align: center;
