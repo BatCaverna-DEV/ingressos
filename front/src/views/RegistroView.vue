@@ -60,7 +60,7 @@
 import { ref } from 'vue';
 import { registrar } from '../services/auth.service.js';
 
-const SUSPENSO = true;
+const SUSPENSO = false;
 
 const form = ref({ nome: '', email: '', matricula: '' });
 const enviando = ref(false);
