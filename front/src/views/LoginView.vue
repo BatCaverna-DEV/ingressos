@@ -12,8 +12,15 @@
 
       <Alerta :mensagem="erro" tipo="danger" @fechar="erro = null" />
 
-      <p class="login-hint">Acesse com sua conta Google institucional</p>
+      <p class="login-hint">
+        Alunos, acessem com sua conta <strong>@acad.ifma.edu.br</strong>
+      </p>
       <div id="google-btn" class="google-btn-wrapper"></div>
+
+      <div class="registro-note">
+        <i class="fas fa-info-circle"></i>
+        Já concluiu o curso? O cadastro abaixo é exclusivo para egressos.
+      </div>
 
       <RouterLink to="/registro" class="btn-registro">
         <i class="fas fa-user-graduate"></i>
@@ -123,8 +130,8 @@ onMounted(() => {
 }
 
 .login-hint {
-  font-size: 0.8rem;
-  color: #94a3b8;
+  font-size: 0.95rem;
+  color: #475569;
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -134,12 +141,32 @@ onMounted(() => {
   justify-content: center;
 }
 
+.registro-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.6rem 0.75rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 0.5rem;
+  color: #92400e;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.registro-note i {
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
 .btn-registro {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-top: 0.75rem;
   width: 100%;
   padding: 0.7rem 1rem;
   border-radius: 0.6rem;
