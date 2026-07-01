@@ -15,8 +15,9 @@
       <p class="login-hint">Acesse com sua conta Google institucional</p>
       <div id="google-btn" class="google-btn-wrapper"></div>
 
-      <RouterLink to="/registro" class="link-registro">
-        Acesso externo? Cadastre-se aqui
+      <RouterLink to="/registro" class="btn-registro">
+        <i class="fas fa-user-graduate"></i>
+        Cadastro de Egressos
       </RouterLink>
     </div>
   </div>
@@ -133,12 +134,27 @@ onMounted(() => {
   justify-content: center;
 }
 
-.link-registro {
-  margin-top: 1.25rem;
-  font-size: 0.8rem;
-  color: #4f46e5;
+.btn-registro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-decoration: none;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  transition: all 0.2s;
 }
 
-.link-registro:hover { text-decoration: underline; }
+.btn-registro:hover {
+  color: white;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+  transform: translateY(-1px);
+}
 </style>
