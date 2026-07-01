@@ -301,12 +301,41 @@
             <p class="text-muted small mb-3">
               Serão emitidos automaticamente <strong>{{ evento?.quantidade }}</strong> ingresso(s) ao confirmar.
             </p>
-            <div class="mb-3">
+            <div class="mb-3 usuario-combo">
               <label class="form-label fw-semibold">Usuário</label>
-              <select v-model="formInscricao.usuarios_id" class="form-select">
-                <option value="">Selecione...</option>
-                <option v-for="u in usuarios" :key="u.id" :value="u.id">{{ u.nome }} — {{ u.email }}</option>
-              </select>
+              <div v-if="usuarioSelecionado" class="usuario-selecionado">
+                <div>
+                  <div class="fw-semibold">{{ usuarioSelecionado.nome }}</div>
+                  <div class="text-muted small">{{ usuarioSelecionado.email }}</div>
+                </div>
+                <button type="button" class="btn-limpar-usuario" @click="limparUsuarioSelecionado">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <template v-else>
+                <input
+                  v-model="buscaUsuario"
+                  type="text"
+                  class="form-control"
+                  placeholder="Buscar por nome..."
+                  @focus="mostrarSugestoes = true"
+                />
+                <div v-if="mostrarSugestoes && buscaUsuario.trim()" class="usuario-dropdown">
+                  <button
+                    v-for="u in usuariosSugeridos"
+                    :key="u.id"
+                    type="button"
+                    class="usuario-opcao"
+                    @click="selecionarUsuario(u)"
+                  >
+                    <div class="fw-semibold">{{ u.nome }}</div>
+                    <div class="text-muted small">{{ u.email }}</div>
+                  </button>
+                  <div v-if="usuariosSugeridos.length === 0" class="usuario-opcao-vazia">
+                    Nenhum usuário encontrado.
+                  </div>
+                </div>
+              </template>
             </div>
             <div class="mb-3">
               <label class="form-label fw-semibold">Categoria do ingresso</label>
@@ -372,11 +401,32 @@ const formInscricao = ref({ usuarios_id: '', categorias_id: '' });
 const qrSelecionado = ref(null);
 const aba = ref('inscricoes');
 const ticketRefs = ref({});
+const buscaUsuario = ref('');
+const mostrarSugestoes = ref(false);
+const usuarioSelecionado = ref(null);
 let modal = null;
 
 const minhaInscricao = computed(() =>
   inscricoes.value.find(i => i.usuarios_id === usuarioAtual?.id) || null
 );
+
+const usuariosSugeridos = computed(() => {
+  const termo = buscaUsuario.value.trim().toLowerCase();
+  if (!termo) return [];
+  return usuarios.value.filter(u => u.nome?.toLowerCase().includes(termo)).slice(0, 8);
+});
+
+const selecionarUsuario = (u) => {
+  usuarioSelecionado.value = u;
+  formInscricao.value.usuarios_id = u.id;
+  buscaUsuario.value = '';
+  mostrarSugestoes.value = false;
+};
+
+const limparUsuarioSelecionado = () => {
+  usuarioSelecionado.value = null;
+  formInscricao.value.usuarios_id = '';
+};
 
 const formatarData = (d) => d ? new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
 const statusLabel = (s) => ({ 1: 'Disponível', 2: 'Usado', 0: 'Cancelado' }[s] || '-');
@@ -420,6 +470,9 @@ const carregar = async () => {
 
 const abrirModalInscricao = () => {
   formInscricao.value = { usuarios_id: '', categorias_id: '' };
+  usuarioSelecionado.value = null;
+  buscaUsuario.value = '';
+  mostrarSugestoes.value = false;
   modal.show();
 };
 
@@ -1222,4 +1275,65 @@ const cancelarMinhaInscricao = async () => {
 @media (max-width: 768px) {
   .detail-layout { grid-template-columns: 1fr; }
 }
+
+.usuario-combo { position: relative; }
+
+.usuario-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  margin-top: 0.25rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.usuario-opcao {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.6rem 0.85rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.1s;
+}
+
+.usuario-opcao:last-child { border-bottom: none; }
+.usuario-opcao:hover { background: #f5f3ff; }
+
+.usuario-opcao-vazia {
+  padding: 0.75rem 0.85rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.usuario-selecionado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+
+.btn-limpar-usuario {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  flex-shrink: 0;
+}
+
+.btn-limpar-usuario:hover { color: #dc2626; }
 </style>
