@@ -10,7 +10,14 @@
 
       <div class="login-divider"></div>
 
-      <div v-if="sucesso" class="sucesso-box">
+      <div v-if="SUSPENSO" class="suspenso-box">
+        <i class="fas fa-tools"></i>
+        <p>Cadastro suspenso temporariamente</p>
+        <p class="suspenso-sub">Estamos com o cadastro de egressos pausado no momento. Tente novamente mais tarde.</p>
+        <RouterLink to="/login" class="btn-voltar">Voltar ao login</RouterLink>
+      </div>
+
+      <div v-else-if="sucesso" class="sucesso-box">
         <i class="fas fa-check-circle"></i>
         <p>Cadastro realizado com sucesso!</p>
         <p class="sucesso-sub">Você já pode fazer login com sua conta Google.</p>
@@ -52,6 +59,8 @@
 <script setup>
 import { ref } from 'vue';
 import { registrar } from '../services/auth.service.js';
+
+const SUSPENSO = true;
 
 const form = ref({ nome: '', email: '', matricula: '' });
 const enviando = ref(false);
@@ -260,4 +269,31 @@ const enviar = async () => {
 }
 
 .btn-voltar:hover { opacity: 0.9; color: white; }
+
+.suspenso-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.suspenso-box i {
+  font-size: 2.5rem;
+  color: #d97706;
+}
+
+.suspenso-box p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.suspenso-sub {
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+  color: #64748b !important;
+}
 </style>
