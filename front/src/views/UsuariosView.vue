@@ -11,6 +11,20 @@
     </div>
 
     <Alerta :mensagem="alerta.msg" :tipo="alerta.tipo" @fechar="alerta.msg = null" />
+
+    <div class="search-bar">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        v-model="busca"
+        type="text"
+        class="search-input"
+        placeholder="Buscar por nome..."
+      />
+      <button v-if="busca" class="search-clear" @click="busca = ''">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
     <Carregando v-if="carregando" />
 
     <div v-else class="table-card">
@@ -25,7 +39,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="u in usuarios" :key="u.id">
+          <tr v-for="u in usuariosFiltrados" :key="u.id">
             <td>
               <div class="user-cell">
                 <div class="user-avatar">{{ iniciais(u.nome) }}</div>
@@ -59,8 +73,10 @@
               </button>
             </td>
           </tr>
-          <tr v-if="usuarios.length === 0">
-            <td colspan="4" class="empty-row">Nenhum usuário cadastrado.</td>
+          <tr v-if="usuariosFiltrados.length === 0">
+            <td colspan="5" class="empty-row">
+              {{ busca ? 'Nenhum usuário encontrado para essa busca.' : 'Nenhum usuário cadastrado.' }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -126,17 +142,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
 import Alerta from '../components/Alerta.vue';
 import Carregando from '../components/Carregando.vue';
 import api from '../services/api.js';
 
 const usuarios = ref([]);
+const busca = ref('');
 const carregando = ref(false);
 const salvando = ref(false);
 const excluindo = ref(null);
 const alerta = ref({ msg: null, tipo: 'success' });
+
+const usuariosFiltrados = computed(() => {
+  const termo = busca.value.trim().toLowerCase();
+  if (!termo) return usuarios.value;
+  return usuarios.value.filter(u => u.nome?.toLowerCase().includes(termo));
+});
 const form = ref({ id: null, nome: '', email: '', matricula: '', categoria: 2, status: 1 });
 let modal = null;
 
@@ -240,6 +263,55 @@ const excluirUsuario = async (u) => {
 
 .btn-primary-action:hover { opacity: 0.9; }
 .btn-primary-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.search-bar {
+  position: relative;
+  max-width: 360px;
+  margin-bottom: 1.25rem;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem 2.25rem 0.6rem 2.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+  background: white;
+}
+
+.search-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.search-clear {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.2rem;
+}
+
+.search-clear:hover { color: #475569; }
 
 .table-card {
   background: white;
