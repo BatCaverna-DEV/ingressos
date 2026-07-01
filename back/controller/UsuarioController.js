@@ -64,6 +64,9 @@ export const registrar = async (req, res) => {
   try {
     const { nome, email, matricula } = req.body;
     if (!nome || !email) return erro(res, 'Nome e e-mail são obrigatórios', 400);
+    if (email.toLowerCase().endsWith('@acad.ifma.edu.br')) {
+      return erro(res, 'Egressos não podem se cadastrar com e-mail institucional (@acad.ifma.edu.br)', 400);
+    }
     if (!email.toLowerCase().endsWith('@gmail.com')) return erro(res, 'Utilize um e-mail do Google (@gmail.com)', 400);
     const existente = await Usuario.findOne({ where: { email } });
     if (existente) return erro(res, 'E-mail já cadastrado', 409);

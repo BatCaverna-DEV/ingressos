@@ -77,6 +77,10 @@ const enviar = async () => {
     erro.value = 'O CPF é obrigatório.';
     return;
   }
+  if (form.value.email.toLowerCase().endsWith('@acad.ifma.edu.br')) {
+    erro.value = 'Egressos não podem se cadastrar com e-mail institucional (@acad.ifma.edu.br).';
+    return;
+  }
   if (!form.value.email.toLowerCase().endsWith('@gmail.com')) {
     erro.value = 'Utilize um e-mail do Google (@gmail.com).';
     return;
