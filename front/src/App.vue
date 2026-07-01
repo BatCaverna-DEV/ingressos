@@ -39,7 +39,7 @@ body {
 @media (max-width: 768px) {
   .app-content {
     margin-left: 0;
-    padding: 1rem;
+    padding: 1rem 1rem calc(1rem + 65px);
   }
 }
 </style>
