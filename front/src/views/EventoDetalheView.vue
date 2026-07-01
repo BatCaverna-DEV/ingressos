@@ -54,6 +54,10 @@
           <i class="fas fa-user-plus"></i> Inscrever Usuário
         </button>
 
+        <RouterLink v-if="isAdmin" to="/validar" class="btn-validar w-100 mt-2">
+          <i class="fas fa-qrcode"></i> Validar Ingressos
+        </RouterLink>
+
         <!-- Auto-inscrição para usuário Padrão -->
         <div v-else class="self-inscricao-card mt-3">
           <!-- Pendente -->
@@ -634,6 +638,28 @@ const cancelarMinhaInscricao = async () => {
 
 .btn-primary-action:hover { opacity: 0.9; }
 .btn-primary-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-validar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.5rem;
+  border: 2px solid #4f46e5;
+  background: white;
+  color: #4f46e5;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.btn-validar:hover {
+  background: #f5f3ff;
+  color: #4f46e5;
+}
 .w-100 { width: 100%; }
 
 .detail-layout {
